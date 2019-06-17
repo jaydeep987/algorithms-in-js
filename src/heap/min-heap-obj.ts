@@ -1,21 +1,34 @@
-import { Base } from '../utils/runner';
+import * as signale from 'signale';
+
 import { swapArrayItem } from '../utils/basic-utils';
+import { Base } from '../utils/runner';
 
 export interface HeapObj {
+  /** Key or label */
   key: string | number;
+  /** Value of key by which heap will be managed */
   value: number;
 }
 
+/**
+ * Min heap for object types
+ */
 export class MinHeap implements Base {
-  private heap: HeapObj[];
+  /**
+   * The heap of objects
+   */
+  protected heap: HeapObj[];
 
   constructor() {
     this.heap = [];
   }
 
+  /**
+   * Insert new item in heap and heapify the tree
+   */
   insert(item: HeapObj): void {
-    if (!item) return;
-  
+    if (!item) { return; }
+
     this.heap.push(item);
     let index = this.heap.length - 1;
     let parent = Math.ceil(index / 2) - 1;
@@ -27,10 +40,13 @@ export class MinHeap implements Base {
     }
   }
 
-  remove(key?: string | number): HeapObj {
-    if (!this.heap.length) return;
+  /**
+   * Remove item from heap which is root element
+   */
+  remove(key?: string | number): HeapObj | undefined {
+    if (!this.heap.length) { return undefined; }
 
-    const indexToRemove = this.findIndex(key) || 0;
+    const indexToRemove = key && this.findIndex(key) || 0;
     const removed = this.heap[indexToRemove];
 
     // Bring last element to first
@@ -44,13 +60,13 @@ export class MinHeap implements Base {
     let child2;
 
     while (true) {
-      child1 = 2 * index + 1;
-      child2 = 2 * index + 2;
+      child1 = index * 2 + 1;
+      child2 = index * 2 + 2;
 
       if (!this.heap[child1]) {
         break;
       }
-  
+
       if (this.heap[child2]) {
         if (this.heap[child1].value < this.heap[child2].value && this.heap[child1].value < this.heap[index].value) {
           swapArrayItem(this.heap, child1, index);
@@ -74,100 +90,116 @@ export class MinHeap implements Base {
     return removed;
   }
 
-  findIndex(key): number {
-    if (!key || this.isEmpty()) return undefined;
+  /**
+   * Find index of given key in heap
+   */
+  findIndex(key: string | number): number | undefined {
+    if (!key || this.isEmpty()) { return undefined; }
     let foundIndex;
 
     this.heap.some((item, index) => {
-      console.log(item.key, key);
       if (item.key === key) {
         foundIndex = index;
       }
+
       return item.key === key;
     });
-    console.log(foundIndex , key);
 
     return foundIndex;
   }
 
+  /**
+   * Checks if heap is empty or not
+   */
   isEmpty(): boolean {
     return this.heap.length === 0;
   }
 
-  hasElement(key): boolean {
-    if (this.isEmpty()) return false;
+  /**
+   * Checks if heap has object of given key or not
+   */
+  hasElement(key: string | number): boolean {
+    if (this.isEmpty()) { return false; }
 
+    // tslint:disable-next-line
     // @ts-ignore
     return this.heap.find((item) => item.key === key) !== undefined;
   }
 
-  replaceElement(key: string | number, value: number) {
-    if (this.isEmpty()) return;
+  /**
+   * Replaces given element's value in heap with given value
+   */
+  replaceElement(key: string | number, value: number): void {
+    if (this.isEmpty()) { return; }
 
     this.remove(key);
     this.insert({ key, value });
   }
 
-  public run() {
+  // tslint:disable:no-magic-numbers
+  /**
+   * Runs various tests
+   */
+  run(): void {
     this.heap = [];
 
-    console.log();
-    console.log('inserting in heap');
+    signale.log();
+    signale.watch('Inserting in heap ..');
     // insert
     this.insert({ key: 1, value: 10 });
     this.insert({ key: 2, value: 15 });
-    console.log(this.heap);
+    signale.debug(this.heap);
     this.insert({ key: 3, value: 20 });
-    console.log(this.heap);
+    signale.debug(this.heap);
     this.insert({ key: 4, value: 12 });
-    console.log(this.heap);
+    signale.debug(this.heap);
     this.insert({ key: 5, value: 18 });
-    console.log(this.heap);
+    signale.debug(this.heap);
     this.insert({ key: 6, value: 16 });
-    console.log(this.heap);
+    signale.debug(this.heap);
     this.insert({ key: 7, value: 17 });
-    console.log(this.heap);
+    signale.debug(this.heap);
     this.insert({ key: 8, value: 5 });
 
-    console.log(this.heap);
+    signale.debug(this.heap);
 
-    console.log('Removing from heap from root always');
+    signale.watch('Removing from heap from root always');
 
-    console.log();
+    signale.log();
     let removed;
     removed = this.remove();
-    console.log(`Removed root =>`, removed);
-    console.log(this.heap);
+    signale.debug(`Removed root =>`, removed);
+    signale.debug(this.heap);
     removed = this.remove();
-    console.log(`Removed root =>`, removed);
-    console.log(this.heap);
+    signale.debug(`Removed root =>`, removed);
+    signale.debug(this.heap);
     removed = this.remove();
-    console.log(`Removed root =>`, removed);
-    console.log(this.heap);
+    signale.debug(`Removed root =>`, removed);
+    signale.debug(this.heap);
     removed = this.remove();
-    console.log(`Removed root =>`, removed);
-    console.log(this.heap);
+    signale.debug(`Removed root =>`, removed);
+    signale.debug(this.heap);
     removed = this.remove();
-    console.log(`Removed root =>`, removed);
-    console.log(this.heap);
+    signale.debug(`Removed root =>`, removed);
+    signale.debug(this.heap);
     removed = this.remove();
-    console.log(`Removed root =>`, removed);
-    console.log(this.heap);
+    signale.debug(`Removed root =>`, removed);
+    signale.debug(this.heap);
     removed = this.remove();
-    console.log(`Removed root =>`, removed);
-    console.log(this.heap);
-    console.log('Insert 2');
+    signale.debug(`Removed root =>`, removed);
+    signale.debug(this.heap);
+    signale.debug('Insert 2');
     this.insert({ key: 9, value: 2 });
-    console.log(this.heap);
+    signale.debug(this.heap);
     removed = this.remove();
-    console.log(`Removed root =>`, removed);
-    console.log(this.heap);
+    signale.debug(`Removed root =>`, removed);
+    signale.debug(this.heap);
     removed = this.remove();
-    console.log(`Removed root =>`, removed);
-    console.log(this.heap);
+    signale.debug(`Removed root =>`, removed);
+    signale.debug(this.heap);
 
-    console.log();
-    console.log('Remove by key');
+    signale.debug();
+    signale.watch('Remove by key');
 
     // insert
     this.insert({ key: 1, value: 10 });
@@ -178,18 +210,19 @@ export class MinHeap implements Base {
     this.insert({ key: 6, value: 16 });
     this.insert({ key: 7, value: 17 });
     this.insert({ key: 8, value: 5 });
-    console.log(this.heap);
+    signale.debug(this.heap);
 
     // remove key
     removed = this.remove(4);
-    console.log('Removed => ', removed);
-    console.log(this.heap);
+    signale.debug('Removed => ', removed);
+    signale.debug(this.heap);
 
     // replace value of key
 
     this.replaceElement(3, 9);
 
-    console.log(`Replaced 3's value with 9=>`);
-    console.log(this.heap);
+    signale.watch(`Replaced 3's value with 9=>`);
+    signale.debug(this.heap);
   }
+  // tslint:enable:no-magic-numbers
 }

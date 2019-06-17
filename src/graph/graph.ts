@@ -1,34 +1,57 @@
+import * as signale from 'signale';
+
 import { Base } from '../utils/runner';
+
+// tslint:disable:no-magic-numbers
 
 export interface AdjList {
   [key: string]: Edge[];
 }
 
 export interface Edge {
+  /** To vertex */
   toVertexLabel: string;
-  weight: number;
+  /** Weight of vertex */
+  weight?: number;
 }
 
+/**
+ * Graph data structure allows here to create, insert, remove operations of graph
+ */
 export class Graph implements Base {
+  /**
+   * Adjacency list
+   */
   protected adjList: AdjList;
 
   constructor() {
     this.adjList = {};
   }
 
-  addVertex(vertexLabel: string) {
+  /**
+   * Add new vertex
+   */
+  addVertex(vertexLabel: string): void {
     this.adjList[vertexLabel] = [];
   }
 
-  addEdge(fromVertex: string, toVertex: string, weight?: number) {
+  /**
+   * Add new edge between two vertices with optional weight
+   */
+  addEdge(fromVertex: string, toVertex: string, weight?: number): void {
     this.adjList[fromVertex].push({
       toVertexLabel: toVertex,
       weight,
     });
   }
 
-  generateFromMatrix(matrix: number[][]) {
-    if (!matrix) return;
+  /**
+   * Generate adjacency list from given 2D matrix
+   */
+  generateFromMatrix(matrix: number[][]): void {
+    if (!matrix) {
+      return;
+    }
 
     matrix.forEach((fromVertices, indexFrom) => {
       this.addVertex(`${indexFrom}`);
@@ -37,21 +60,27 @@ export class Graph implements Base {
           this.addEdge(`${indexFrom}`, `${indexTo}`);
         }
       });
-    })
+    });
   }
 
-  clear() {
+  /**
+   * Clear adjacency list
+   */
+  clear(): void {
     this.adjList = {};
   }
 
-  bfsTraverse(startVertex: string = '1') {
+  /**
+   * Breadth first search traversal
+   */
+  bfsTraverse(startVertex: string = '1'): void {
     const listSize = Object.keys(this.adjList).length;
-  
+
     if (!listSize) {
       return;
     }
 
-    const traversedVertices = [];
+    const traversedVertices: string[] = [];
     let index = 0;
 
     traversedVertices.push(startVertex);
@@ -62,15 +91,19 @@ export class Graph implements Base {
           traversedVertices.push(edge.toVertexLabel);
         }
       });
-      index++;
+      index = index + 1;
     }
 
-    console.log(traversedVertices.join(' -> '));
+    signale.debug('BFS Traversal path:');
+    signale.debug(traversedVertices.join(' -> '));
   }
 
-  dfsTraverse(startVertex: string = '1') {
+  /**
+   * Depth first search traversal
+   */
+  dfsTraverse(startVertex: string = '1'): void {
     const visited = [startVertex];
-    const traverse = (vertex) => {
+    const traverse = (vertex: string) => {
       const edges = this.adjList[vertex];
       edges.forEach((edge) => {
         const toVertexLabel = edge.toVertexLabel;
@@ -80,26 +113,32 @@ export class Graph implements Base {
         }
       });
     };
+
     traverse(startVertex);
-    console.log(visited.join(' -> '));
+
+    signale.debug('BFS Traversal path:');
+    signale.debug(visited.join(' -> '));
   }
 
-  run() {
+  /**
+   * Runs various tests
+   */
+  run(): void {
     // feed data via matrix
     const matrix = [
       [0, 1, 0, 1, 0],
       [1, 0, 1, 1, 1],
       [0, 1, 0, 0, 1],
       [1, 1, 0, 0, 1],
-      [0, 1, 1, 1, 0]
+      [0, 1, 1, 1, 0],
     ];
     this.generateFromMatrix(matrix);
 
-    console.log();
-    console.log('Graph generated via matrix');
-    console.log('BFS Traverse, start vertex: 0');
+    signale.log();
+    signale.watch('Graph generated via matrix');
+    signale.watch('BFS Traverse, start vertex: 0');
     this.bfsTraverse('0');
-    console.log('DFS Traverse, start vertex: 0');
+    signale.watch('DFS Traverse, start vertex: 0');
     this.dfsTraverse('0');
 
     // clear
@@ -121,17 +160,17 @@ export class Graph implements Base {
     this.addEdge('5', '2', 20);
     this.addEdge('5', '3', 35);
 
-    console.log();
-    console.log('Graph generated via direct entries');
+    signale.log();
+    signale.watch('Graph generated via direct entries');
     // run all methods
-    console.log('BFS Traverse, defaul vertex: 1');
+    signale.watch('BFS Traverse, defaul vertex: 1');
     this.bfsTraverse();
-    console.log('BFS Traverse, given vertex: 5');
+    signale.watch('BFS Traverse, given vertex: 5');
     this.bfsTraverse('5');
 
-    console.log('DFS Traverse, defaul vertex: 1');
+    signale.watch('DFS Traverse, defaul vertex: 1');
     this.dfsTraverse();
-    console.log('DFS Traverse, given vertex: 5');
+    signale.watch('DFS Traverse, given vertex: 5');
     this.dfsTraverse('5');
   }
 }
